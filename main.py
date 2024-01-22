@@ -11,6 +11,12 @@ class Name(Field):
     pass
 
 class Phone(Field):
+
+
+    @staticmethod
+    def is_valid(phone_number):
+        return len(phone_number) == 10 and phone_number.isdigit()
+    
     def __init__(self, value):
         # Валідація формату номера телефону (10 цифр)
         if not isinstance(value, str) or not value.isdigit() or len(value) != 10:
@@ -36,14 +42,23 @@ class Record:
         return None
 
     def edit_phone(self, old_phone_number, new_phone_number):
+        # Перевірка валідності нового номера телефону
+        if not Phone.is_valid(new_phone_number):
+            raise ValueError("Invalid phone number")
+
         found = False
         for phone in self.phones:
             if phone.value == old_phone_number:
+                # Перевірка валідності старого номера телефону
+                if not Phone.is_valid(old_phone_number):
+                    raise ValueError("Invalid old phone number")
+
                 phone.value = new_phone_number
                 found = True
                 break
-        if not found:
-            raise ValueError("Phone number not found")
+        if found:
+            return
+        raise ValueError("Phone number not found")
 
 
     def __str__(self):
